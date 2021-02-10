@@ -1,0 +1,15 @@
+---
+   # Install and deploy httpd
+   -   name: Install httpd
+       yum:
+         name: httpd
+         state: present
+   -   name: Create html page
+       shell:
+           cmd: echo "<html><h1>HELL0 ESGI !</h1></html>" > /var/www/html/index.html
+   -   name: Restart httpd server
+       service:
+           name: httpd
+           state: restarted
+
+

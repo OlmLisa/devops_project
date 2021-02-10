@@ -35,15 +35,15 @@ jobs:
     - stage: sonar_scanner
       addons:
         sonarcloud:
-          organization: "juanproject" # the key of the org you chose at step #3
+          organization: "OlmLisa" # the key of the org you chose at step #3
           token: $SONAR_KEY
       script:
         # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
-        - mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=juanProject_sample-application-students
+        - mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=$SONAR_KEY
     - stage: deploy
       if: branch = master
       addons:
-        ssh_known_hosts: urrego-juan-formation.takima.io
+        ssh_known_hosts: lisa-oulmi.takima.io
       install:
         - sudo apt update
         - sudo apt install software-properties-common

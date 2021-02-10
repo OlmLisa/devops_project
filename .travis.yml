@@ -39,7 +39,7 @@ jobs:
           token: $SONAR_KEY
       script:
         # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
-        - mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=$SONAR_KEY
+        - mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=devops_project
     - stage: deploy
       if: branch = master
       addons:

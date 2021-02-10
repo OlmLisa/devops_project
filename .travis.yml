@@ -8,30 +8,24 @@ jobs:
     - stage: test
       script:
         - mvn clean verify
-    - stage: publish_database
-      if: branch = develop
-      script:
-        - docker build -t $DOCKERHUB_USER/database_base ./Database
-      after_success:
-        - echo $DOCKERHUB_PWD | docker login --username $DOCKERHUB_USER --password-stdin
-        - docker tag $DOCKERHUB_USER/database_base $DOCKERHUB_USER/database_base:1.1
-        - docker push $DOCKERHUB_USER/database_base
     - stage: publish_backend
-      if: branch = develop
       script:
-        - docker build -t $DOCKERHUB_USER/backend_base ./Backend
+        - docker build -t $DOCKERHUB_USER/tp-db ./database
       after_success:
         - echo $DOCKERHUB_PWD | docker login --username $DOCKERHUB_USER --password-stdin
-        - docker tag $DOCKERHUB_USER/backend_base $DOCKERHUB_USER/backend_base:1.1
-        - docker push $DOCKERHUB_USER/backend_base
-    - stage: publish_server
-      if: branch = develop
+        - docker push $DOCKERHUB_USER/tp-db
+    - stage: publish_httpd
       script:
-        - docker build -t $DOCKERHUB_USER/server_base ./Server
+        - docker build -t $DOCKERHUB_USER/tp-http ./httpd
       after_success:
         - echo $DOCKERHUB_PWD | docker login --username $DOCKERHUB_USER --password-stdin
-        - docker tag $DOCKERHUB_USER/server_base $DOCKERHUB_USER/server_base:1.1
-        - docker push $DOCKERHUB_USER/server_base
+        - docker push $DOCKERHUB_USER/tp-http
+    - stage: publish_api
+      script:
+        - docker build -t $DOCKERHUB_USER/tp-api ./simple-api
+      after_success:
+        - echo $DOCKERHUB_PWD | docker login --username $DOCKERHUB_USER --password-stdin
+        - docker push $DOCKERHUB_USER/tp-api
     - stage: sonar_scanner
       addons:
         sonarcloud:
@@ -41,7 +35,6 @@ jobs:
         # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
         - mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=devops_project
     - stage: deploy
-      if: branch = master
       addons:
         ssh_known_hosts: lisa-oulmi.takima.io
       install:
@@ -49,6 +42,8 @@ jobs:
         - sudo apt install software-properties-common
         - sudo apt-add-repository --yes --update ppa:ansible/ansible
         - sudo apt install ansible
+        - ansible-galaxy install --roles-path ./roles/ geerlingguy.docker
+        - ansible-galaxy install --roles-path ./roles/ weareinteractive.docker_compose
       script:
         - openssl aes-256-cbc -K $encrypted_f217180e22ee_key -iv $encrypted_f217180e22ee_iv -in id_rsa.enc -out /tmp/deploy_rsa -d
         - eval "$(ssh-agent -s)"

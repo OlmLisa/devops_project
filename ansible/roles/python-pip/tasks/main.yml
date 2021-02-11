@@ -1,0 +1,11 @@
+---
+   # Install epel and python-pip
+   -   name: Install epel
+       yum:
+         name: epel-release
+         state: present
+   -   name: Install python-pip
+       yum:
+         name: python-pip
+         state: present
+

@@ -1,12 +1,9 @@
 ---
-  - name: install weareinteractive docker-compose
-    shell:
-      cmd: ansible-galaxy install weareinteractive.docker_compose
   - name: copy docker_compose yml
     copy:
-      src: /docker-compose.yml
+      src: ../docker-compose.yml
       dest: /home/centos
-  # Install the last docker-compose.yaml
-  - name: install docker-composer.yaml
+  - name: docker-compose up
+    become_user: centos
     shell:
-      cmd: docker-compose up
+      cmd: docker-compose up -d
